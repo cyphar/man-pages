@@ -22,7 +22,7 @@
 .\" the source, must acknowledge the copyright and authors of this work.
 .\" %%%LICENSE_END
 .\"
-.TH PATH_RESOLUTION 7 2017-11-26 "Linux" "Linux Programmer's Manual"
+.TH PATH_RESOLUTION 7 2019-10-03 "Linux" "Linux Programmer's Manual"
 .SH NAME
 path_resolution \- how a pathname is resolved to a file
 .SH DESCRIPTION
@@ -199,6 +199,21 @@ successfully.
 Linux returns
 .B ENOENT
 in this case.
+.PP
+As of Linux 5.FOO, an empty path argument can be used to indicate the "re-open"
+an existing file descriptor if
+.B O_EMPTYPATH
+is passed as a flag argument to
+.BR openat (2),
+with the
+.I dfd
+argument indicating which file descriptor to "re-open". This is approximately
+equivalent to opening
+.I /proc/self/fd/$fd
+where
+.I $fd
+is the open file descriptor to be "re-opened".
+
 .SS Permissions
 The permission bits of a file consist of three groups of three bits; see
 .BR chmod (1)

@@ -48,7 +48,7 @@
 .\" FIXME . Apr 08: The next POSIX revision has O_EXEC, O_SEARCH, and
 .\" O_TTYINIT.  Eventually these may need to be documented.  --mtk
 .\"
-.TH OPEN 2 2018-04-30 "Linux" "Linux Programmer's Manual"
+.TH OPEN 2 2019-10-03 "Linux" "Linux Programmer's Manual"
 .SH NAME
 open, openat, creat \- open and possibly create a file
 .SH SYNOPSIS
@@ -421,6 +421,21 @@ was followed by a call to
 .BR fdatasync (2)).
 .IR "See NOTES below" .
 .TP
+.BR O_EMPTYPATH " (since Linux 5.FOO)"
+If \fIpathname\fP is an empty string, re-open the the file descriptor given as
+the \fIdirfd\fP argument to
+.BR openat (2).
+This can be used with both ordinary (file and directory) and \fBO_PATH\fP file
+descriptors, but cannot be used with
+.BR AT_FDCWD
+(or as an argument to plain
+.BR open (2).) When re-opening an \fBO_PATH\fP file descriptor, the same "link
+mode" restrictions apply as with re-opening through
+.BR proc (5)
+(see
+.BR path_resolution "(7) and " symlink (7)
+for more details.)
+.TP
 .B O_EXCL
 Ensure that this call creates the file:
 if this flag is specified in conjunction with
@@ -668,6 +683,13 @@ with
 (or via procfs using
 .BR AT_SYMLINK_FOLLOW )
 even if the file is not a directory.
+You can even "re-open" (or upgrade) an
+.BR O_PATH
+file descriptor by using
+.BR O_EMPTYPATH
+(see the section for
+.BR O_EMPTYPATH
+for more details.)
 .IP *
 Passing the file descriptor to another process via a UNIX domain socket
 (see
@@ -958,6 +980,15 @@ is not allowed.
 (See also
 .BR path_resolution (7).)
 .TP
+.B EBADF
+.I pathname
+was an empty string (and
+.B O_EMPTYPATH
+was passed) with
+.BR open (2)
+(instead of
+.BR openat (2).)
+.TP
 .B EDQUOT
 Where
 .B O_CREAT
@@ -1202,6 +1233,15 @@ The following additional errors can occur for
 .B EBADF
 .I dirfd
 is not a valid file descriptor.
+.TP
+.B EBADF
+.I pathname
+was an empty string (and
+.B O_EMPTYPATH
+was passed), but the provided
+.I dirfd
+was an invalid file descriptor (or was
+.BR AT_FDCWD .)
 .TP
 .B ENOTDIR
 .I pathname
