@@ -136,6 +136,22 @@ we are just creating it.
 The details on the treatment
 of the final entry are described in the manual pages of the specific
 system calls.
+.PP
+Since Linux 5.FOO, if the final entry is a "magic link" (see
+.BR symlink (7)),
+and the user is attempting to
+.BR open (2)
+it, then there is an additional permission-related restriction applied to the
+operation: the requested access mode must not exceed the "link mode" of the
+magic link (unlike ordinary symbolic links, magic links have their own file
+mode.)
+For example, if
+.I /proc/[pid]/fd/[num]
+has a link mode of
+.BR 0500 ,
+unprivileged users are not permitted to
+.BR open ()
+the magic link for writing.
 .SS . and ..
 By convention, every directory has the entries "." and "..",
 which refer to the directory itself and to its parent directory,
